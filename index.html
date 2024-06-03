@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Processos</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+</head>
+<body class="flex">
+  <div x-data="{ open: false }" class="flex flex-col min-h-screen w-64 bg-gray-800 text-white">
+    <div class="flex items-center justify-between p-4">
+      <h1 class="text-xl font-bold">Menu</h1>
+      <button @click="open = !open" class="text-gray-500 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+    <nav x-show="open" class="flex-1 px-4 py-2 space-y-2">
+      <a href="index.html" class="block px-4 py-2 rounded hover:bg-gray-700">Processos</a>
+      <a href="edit.html" class="block px-4 py-2 rounded hover:bg-gray-700">Novo Processo</a>
+    </nav>
+  </div>
+  <div class="flex-1 p-6">
+    <h1 class="text-2xl font-bold mb-4">Lista de Processos</h1>
+    <table class="min-w-full bg-white">
+      <thead>
+        <tr>
+          <th class="py-2 px-4 border-b">ID</th>
+          <th class="py-2 px-4 border-b">Nome</th>
+          <th class="py-2 px-4 border-b">Versão</th>
+          <th class="py-2 px-4 border-b">Objetivo</th>
+          <th class="py-2 px-4 border-b">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="processTable">
+        <!-- As linhas dos processos serão preenchidas pelo JavaScript -->
+      </tbody>
+    </table>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadProcesses = async () => {
+        const response = await fetch('/api/processes');
+        if (response.ok) {
+          const processes = await response.json();
+          const processTable = document.getElementById('processTable');
+          processTable.innerHTML = processes.map(process => `
+            <tr>
+              <td class="py-2 px-4 border-b">${process.id}</td>
+              <td class="py-2 px-4 border-b">${process.name}</td>
+              <td class="py-2 px-4 border-b">${process.version}</td>
+              <td class="py-2 px-4 border-b">${process.objective}</td>
+              <td class="py-2 px-4 border-b">
+                <a href="edit.html?id=${process.id}" class="text-blue-600 hover:underline">Editar</a>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          console.error('Falha ao buscar processos');
+        }
+      };
+
+      if (document.getElementById('processTable')) {
+        loadProcesses();
+      }
+    });
+  </script>
+</body>
+</html>

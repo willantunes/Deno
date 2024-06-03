@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
-import { readAll } from "https://deno.land/std@0.224.0/io/read_all.ts";
+import { serveDir } from "https://deno.land/std@0.224.0/http/file_server.ts";
 
 interface Process {
   id: number;
   name: string;
+  version: string;
   objective: string;
   owner: string;
   users: string[];
@@ -13,81 +14,74 @@ interface Process {
   updatedAt?: string;
   updatedBy?: string;
 }
- 
-let processes: Process[] = [];
 
+let processes: Process[] = [];
 let currentId = 1;
 
-console.log(`HTTP webserver running. Access it at: http://localhost:8080/`);
+console.log("Servidor HTTP rodando. Acesse em: http://localhost:8080/");
 
 serve(async (req) => {
-  const url = new URL(req.url, `http://localhost:8080`);
+  const url = new URL(req.url);
+  const pathname = url.pathname;
+  console.log(`Recebida solicitação: ${req.method} ${pathname}`);
 
-  if (url.pathname === "/processes" && req.method === "GET") {
-    return new Response(JSON.stringify(processes), {
-      status: 200,
-      headers: { "Content-Type": "application/json" }
-    });
-  } else if (url.pathname === "/processes" && req.method === "POST") {
-    try {
-      const body = await req.text();
-      console.log("Received body:", body);
-      const data = JSON.parse(body);
-      const { name, objective, owner, users, status } = data;
-      const createdAt = new Date().toISOString();
-      const createdBy = owner;
-
-      const newProcess: Process = {
-        id: currentId++,
-        name,
-        objective,
-        owner,
-        users,
-        status,
-        createdAt,
-        createdBy
-      };
-
-      processes.push(newProcess);
-      return new Response(JSON.stringify(newProcess), {
-        status: 201,
-        headers: { "Content-Type": "application/json" }
-      });
-    } catch (error) {
-      console.error("Error in POST /processes:", error.message);
-      console.error("Stack trace:", error.stack);
-      return new Response(JSON.stringify({ message: "Internal Server Error" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
-  } else if (url.pathname.startsWith("/edit") && req.method === "GET") {
-    try {
-      const html = await Deno.readTextFile("./edit.html");
-      return new Response(html, {
+  if (pathname.startsWith("/api/processes")) {
+    const id = parseInt(pathname.split("/").pop() || "0");
+    if (pathname.startsWith("/api/processes") && req.method === "GET") {
+      console.log("Listando todos os processos");
+      return new Response(JSON.stringify(processes), {
         status: 200,
-        headers: { "Content-Type": "text/html" }
+        headers: { "Content-Type": "application/json" }
       });
-    } catch (error) {
-      console.error("Error reading HTML file:", error.message);
-      console.error("Stack trace:", error.stack);
-      return new Response("Internal Server Error", { status: 500 });
-    }
-  } else if (url.pathname.match(/\/processes\/\d+/) && req.method === "PUT") {
-    const id = parseInt(url.pathname.split("/")[2]);
-    const index = processes.findIndex((process) => process.id === id);
-    if (index !== -1) {
+    } else if (pathname.startsWith("/api/processes") && req.method === "POST") {
       try {
-        const body = await req.text();
-        console.log("Received body for update:", body);
-        const data = JSON.parse(body);
-        const { name, objective, owner, users, status } = data;
-        const updatedAt = new Date().toISOString();
-        const updatedBy = owner;
+        const body = await req.json();
+        console.log("Corpo recebido para POST:", body);
+        const { name, version, objective, owner, users, status } = body;
+        const createdAt = new Date().toISOString();
+        const createdBy = owner;
 
+        const newProcess: Process = {
+          id: currentId++,
+          name,
+          version,
+          objective,
+          owner,
+          users,
+          status,
+          createdAt,
+          createdBy
+        };
+
+        processes.push(newProcess);
+
+        console.log("Processo criado:", newProcess);
+        return new Response(JSON.stringify(newProcess), {
+          status: 201,
+          headers: { "Content-Type": "application/json" }
+        });
+      } catch (error) {
+        console.error("Erro ao criar processo:", error);
+        return new Response(JSON.stringify({ message: "Erro ao criar processo" }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    } else if (pathname.startsWith("/api/processes") && req.method === "PUT") {
+      console.log(`Atualizando processo com ID: ${id}`);
+      const index = processes.findIndex((process) => process.id === id);
+      const body = await req.json();
+      console.log("Corpo recebido para PUT:", body);
+      const { name, version, objective, owner, users, status } = body;
+      const updatedAt = new Date().toISOString();
+      const updatedBy = owner;
+
+      if (index !== -1) {
+        // Atualiza o processo existente
         processes[index] = {
           ...processes[index],
           name,
+          version,
           objective,
           owner,
           users,
@@ -95,25 +89,64 @@ serve(async (req) => {
           updatedAt,
           updatedBy
         };
+        console.log("Processo atualizado:", processes[index]);
         return new Response(JSON.stringify(processes[index]), {
           status: 200,
           headers: { "Content-Type": "application/json" }
         });
-      } catch (error) {
-        console.error("Error in PUT /processes/:id:", error.message);
-        console.error("Stack trace:", error.stack);
-        return new Response(JSON.stringify({ message: "Internal Server Error" }), {
-          status: 500,
+      } else {
+        // Adiciona um novo processo
+        const newProcess: Process = {
+          id: currentId++,
+          name,
+          version,
+          objective,
+          owner,
+          users,
+          status,
+          createdAt: updatedAt,
+          createdBy: updatedBy,
+          updatedAt,
+          updatedBy
+        };
+        processes.push(newProcess);
+        console.log("Novo processo criado:", newProcess);
+        return new Response(JSON.stringify(newProcess), {
+          status: 201,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    } else if (pathname.startsWith("/api/processes") && req.method === "DELETE") {
+      console.log(`Deletando processo com ID: ${id}`);
+      const index = processes.findIndex((process) => process.id === id);
+      if (index !== -1) {
+        processes.splice(index, 1);
+        console.log("Processo deletado");
+        return new Response(JSON.stringify({ message: "Processo deletado" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        });
+      } else {
+        console.log("Processo não encontrado");
+        return new Response(JSON.stringify({ message: "Processo não encontrado" }), {
+          status: 404,
           headers: { "Content-Type": "application/json" }
         });
       }
     } else {
-      return new Response(JSON.stringify({ message: "Process not found" }), {
+      console.log("Rota de API não encontrada");
+      return new Response(JSON.stringify({ message: "Rota não encontrada" }), {
         status: 404,
         headers: { "Content-Type": "application/json" }
       });
     }
   } else {
-    return new Response("Not Found", { status: 404 });
+    console.log("Servindo arquivos estáticos");
+    return serveDir(req, {
+      fsRoot: ".",
+      urlRoot: "",
+      showDirListing: true,
+      enableCors: true,
+    });
   }
 }, { port: 8080 });

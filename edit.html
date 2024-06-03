@@ -1,47 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit Process</title>
+  <title>Editar Processo</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>Edit Process</h1>
-  <form id="editForm">
-    <input type="hidden" id="processId">
-    <div>
-      <label for="name">Name:</label>
-      <input type="text" id="name" required>
+<body class="flex">
+  <div x-data="{ open: false }" class="flex flex-col min-h-screen w-64 bg-gray-800 text-white">
+    <div class="flex items-center justify-between p-4">
+      <h1 class="text-xl font-bold">Menu</h1>
+      <button @click="open = !open" class="text-gray-500 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
     </div>
-    <div>
-      <label for="version">Version:</label>
-      <input type="text" id="version" required>
-    </div>
-    <div>
-      <label for="objective">Objective:</label>
-      <input type="text" id="objective" required>
-    </div>
-    <div>
-      <label for="owner">Owner:</label>
-      <input type="text" id="owner" required>
-    </div>
-    <div>
-      <label for="users">Users (comma separated):</label>
-      <input type="text" id="users" required>
-    </div>
-    <div>
-      <label for="status">Status:</label>
-      <input type="text" id="status" required>
-    </div>
-    <button type="submit">Save</button>
-  </form>
+    <nav x-show="open" class="flex-1 px-4 py-2 space-y-2">
+      <a href="index.html" class="block px-4 py-2 rounded hover:bg-gray-700">Processos</a>
+      <a href="edit.html" class="block px-4 py-2 rounded hover:bg-gray-700">Novo Processo</a>
+    </nav>
+  </div>
+  <div class="flex-1 p-6">
+    <h1 class="text-2xl font-bold mb-4">Editar Processo</h1>
+    <form id="editForm" class="space-y-4">
+      <input type="hidden" id="processId">
+      <div>
+        <label for="name" class="block text-gray-700">Nome:</label>
+        <input type="text" id="name" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <div>
+        <label for="version" class="block text-gray-700">Versão:</label>
+        <input type="text" id="version" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <div>
+        <label for="objective" class="block text-gray-700">Objetivo:</label>
+        <input type="text" id="objective" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <div>
+        <label for="owner" class="block text-gray-700">Responsável:</label>
+        <input type="text" id="owner" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <div>
+        <label for="users" class="block text-gray-700">Usuários (separados por vírgula):</label>
+        <input type="text" id="users" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <div>
+        <label for="status" class="block text-gray-700">Status:</label>
+        <input type="text" id="status" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>
+    </form>
+  </div>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const processId = urlParams.get('id');
       if (processId) {
         document.getElementById('processId').value = processId;
-        const response = await fetch(`/processes/${processId}`);
+        const response = await fetch(`/api/processes/${processId}`);
         if (response.ok) {
           const process = await response.json();
           document.getElementById('name').value = process.name;
@@ -51,7 +68,7 @@
           document.getElementById('users').value = process.users.join(', ');
           document.getElementById('status').value = process.status;
         } else {
-          alert('Process not found');
+          alert('Processo não encontrado');
         }
       }
     });
@@ -67,7 +84,7 @@
         users: document.getElementById('users').value.split(',').map(user => user.trim()),
         status: document.getElementById('status').value,
       };
-      const response = await fetch(`/processes/${processId}`, {
+      const response = await fetch('/api/processes/${processId}', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -75,9 +92,10 @@
         body: JSON.stringify(data),
       });
       if (response.ok) {
-        alert('Process updated successfully');
+        alert('Processo atualizado com sucesso');
+        window.location.href = 'index.html';
       } else {
-        alert('Failed to update process');
+        alert('Falha ao atualizar o processo');
       }
     });
   </script>
