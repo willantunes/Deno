@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Process</title>
+</head>
+<body>
+  <h1>Edit Process</h1>
+  <form id="editForm">
+    <input type="hidden" id="processId">
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" id="name" required>
+    </div>
+    <div>
+      <label for="version">Version:</label>
+      <input type="text" id="version" required>
+    </div>
+    <div>
+      <label for="objective">Objective:</label>
+      <input type="text" id="objective" required>
+    </div>
+    <div>
+      <label for="owner">Owner:</label>
+      <input type="text" id="owner" required>
+    </div>
+    <div>
+      <label for="users">Users (comma separated):</label>
+      <input type="text" id="users" required>
+    </div>
+    <div>
+      <label for="status">Status:</label>
+      <input type="text" id="status" required>
+    </div>
+    <button type="submit">Save</button>
+  </form>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const processId = urlParams.get('id');
+      if (processId) {
+        document.getElementById('processId').value = processId;
+        const response = await fetch(`/processes/${processId}`);
+        if (response.ok) {
+          const process = await response.json();
+          document.getElementById('name').value = process.name;
+          document.getElementById('version').value = process.version;
+          document.getElementById('objective').value = process.objective;
+          document.getElementById('owner').value = process.owner;
+          document.getElementById('users').value = process.users.join(', ');
+          document.getElementById('status').value = process.status;
+        } else {
+          alert('Process not found');
+        }
+      }
+    });
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const processId = document.getElementById('processId').value;
+      const data = {
+        name: document.getElementById('name').value,
+        version: document.getElementById('version').value,
+        objective: document.getElementById('objective').value,
+        owner: document.getElementById('owner').value,
+        users: document.getElementById('users').value.split(',').map(user => user.trim()),
+        status: document.getElementById('status').value,
+      };
+      const response = await fetch(`/processes/${processId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (response.ok) {
+        alert('Process updated successfully');
+      } else {
+        alert('Failed to update process');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "deno.ns"],
+    "allowJs": true
+  },
+  "tasks": {
+    "start": "deno run --allow-net --watch main.ts"
+  }
+}
