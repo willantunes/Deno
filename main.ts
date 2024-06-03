@@ -15,6 +15,7 @@ interface Process {
 }
 
 let processes: Process[] = [];
+
 let currentId = 1;
 
 console.log(`HTTP webserver running. Access it at: http://localhost:8080/`);
