@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // Função para carregar a lista de processos
     const loadProcesses = async () => {
-      const response = await fetch('/api/processes/');
+      const response = await fetch('/api/processes');
       if (response.ok) {
         const processes = await response.json();
         const processTable = document.getElementById('processTable');
@@ -21,46 +21,32 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     };
   
-    // Função para adicionar um novo processo
-    const addProcess = async (process) => {
-      const response = await fetch('/api/processes/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(process),
-      });
+    // Função para carregar detalhes de um processo para edição
+    const loadProcessDetails = async (processId) => {
+      const response = await fetch('/api/processes/${processId}');
       if (response.ok) {
-        loadProcesses();
+        const process = await response.json();
+        document.getElementById('processId').value = process.id;
+        document.getElementById('name').value = process.name;
+        document.getElementById('version').value = process.version;
+        document.getElementById('objective').value = process.objective;
+        document.getElementById('owner').value = process.owner;
+        document.getElementById('users').value = process.users.join(', ');
+        document.getElementById('status').value = process.status;
       } else {
-        console.error('Falha ao adicionar processo');
+        console.error('Falha ao buscar detalhes do processo');
       }
     };
   
-    // Inicializa a lista de processos na página de listagem
     if (document.getElementById('processTable')) {
       loadProcesses();
     }
   
-    // Inicializa o formulário de edição na página de edição
     if (document.getElementById('editForm')) {
       const urlParams = new URLSearchParams(window.location.search);
       const processId = urlParams.get('id');
       if (processId) {
-        fetch(`/api/processes/${processId}`)
-          .then(response => response.json())
-          .then(process => {
-            document.getElementById('processId').value = process.id;
-            document.getElementById('name').value = process.name;
-            document.getElementById('version').value = process.version;
-            document.getElementById('objective').value = process.objective;
-            document.getElementById('owner').value = process.owner;
-            document.getElementById('users').value = process.users.join(', ');
-            document.getElementById('status').value = process.status;
-          })
-          .catch(error => {
-            console.error('Falha ao buscar processo', error);
-          });
+        loadProcessDetails(processId);
       }
   
       document.getElementById('editForm').addEventListener('submit', async (e) => {
@@ -74,10 +60,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           users: document.getElementById('users').value.split(',').map(user => user.trim()),
           status: document.getElementById('status').value,
         };
-        const method = processId ? 'PUT' : 'POST';
-        const url = processId ? '/api/processes/${processId}' : '/api/processes/';
-        const response = await fetch(url, {
-          method,
+        const response = await fetch('/api/processes/${processId}', {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -92,4 +76,3 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
   });
-  

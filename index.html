@@ -8,18 +8,31 @@
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
 </head>
 <body class="flex">
-  <div x-data="{ open: false }" class="flex flex-col min-h-screen w-64 bg-gray-800 text-white">
+  <div x-data="{ open: true }" class="flex flex-col min-h-screen w-64 bg-gray-800 text-white">
     <div class="flex items-center justify-between p-4">
-      <h1 class="text-xl font-bold">Menu</h1>
+      <h1 class="text-xl font-bold" x-show="open">Menu</h1>
       <button @click="open = !open" class="text-gray-500 focus:outline-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <svg x-show="open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <svg x-show="!open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
     </div>
-    <nav x-show="open" class="flex-1 px-4 py-2 space-y-2">
-      <a href="index.html" class="block px-4 py-2 rounded hover:bg-gray-700">Processos</a>
-      <a href="edit.html" class="block px-4 py-2 rounded hover:bg-gray-700">Novo Processo</a>
+    <nav :class="{'hidden': !open, 'block': open}" class="flex-1 px-4 py-2 space-y-2">
+      <a href="index.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18m-9 5h9"></path>
+        </svg>
+        <span x-show="open">Processos</span>
+      </a>
+      <a href="edit.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span x-show="open">Novo Processo</span>
+      </a>
     </nav>
   </div>
   <div class="flex-1 p-6">

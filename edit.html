@@ -7,16 +7,19 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="flex">
-  <div x-data="{ open: false }" class="flex flex-col min-h-screen w-64 bg-gray-800 text-white">
+  <div class="flex flex-col min-h-screen w-64 bg-gray-800 text-white">
     <div class="flex items-center justify-between p-4">
       <h1 class="text-xl font-bold">Menu</h1>
-      <button @click="open = !open" class="text-gray-500 focus:outline-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <button id="toggleButton" class="text-gray-500 focus:outline-none">
+        <svg id="collapseIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <svg id="expandIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
       </button>
     </div>
-    <nav x-show="open" class="flex-1 px-4 py-2 space-y-2">
+    <nav id="menu" class="flex-1 px-4 py-2 space-y-2">
       <a href="index.html" class="block px-4 py-2 rounded hover:bg-gray-700">Processos</a>
       <a href="edit.html" class="block px-4 py-2 rounded hover:bg-gray-700">Novo Processo</a>
     </nav>
@@ -26,39 +29,54 @@
     <form id="editForm" class="space-y-4">
       <input type="hidden" id="processId">
       <div>
-        <label for="name" class="block text-gray-700">Nome:</label>
-        <input type="text" id="name" class="w-full px-4 py-2 border rounded" required>
+        <label for="name" class="block text-sm font-medium text-gray-700">Nome:</label>
+        <input type="text" id="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
       <div>
-        <label for="version" class="block text-gray-700">Versão:</label>
-        <input type="text" id="version" class="w-full px-4 py-2 border rounded" required>
+        <label for="version" class="block text-sm font-medium text-gray-700">Versão:</label>
+        <input type="text" id="version" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
       <div>
-        <label for="objective" class="block text-gray-700">Objetivo:</label>
-        <input type="text" id="objective" class="w-full px-4 py-2 border rounded" required>
+        <label for="objective" class="block text-sm font-medium text-gray-700">Objetivo:</label>
+        <input type="text" id="objective" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
       <div>
-        <label for="owner" class="block text-gray-700">Responsável:</label>
-        <input type="text" id="owner" class="w-full px-4 py-2 border rounded" required>
+        <label for="owner" class="block text-sm font-medium text-gray-700">Proprietário:</label>
+        <input type="text" id="owner" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
       <div>
-        <label for="users" class="block text-gray-700">Usuários (separados por vírgula):</label>
-        <input type="text" id="users" class="w-full px-4 py-2 border rounded" required>
+        <label for="users" class="block text-sm font-medium text-gray-700">Usuários (separados por vírgula):</label>
+        <input type="text" id="users" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
       <div>
-        <label for="status" class="block text-gray-700">Status:</label>
-        <input type="text" id="status" class="w-full px-4 py-2 border rounded" required>
+        <label for="status" class="block text-sm font-medium text-gray-700">Status:</label>
+        <input type="text" id="status" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
-      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Salvar</button>
+      <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Salvar</button>
     </form>
   </div>
   <script>
+    debugger;
+      var urlForFetch = '';
+      var method = '';
+
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const processId = urlParams.get('id');
+      
+
+      if(urlParams.get('id') !== '' && urlParams.get('id') !== undefined && urlParams.get('id') !== null) {
+      urlForFetch = '/api/processes/' + urlParams.get('id');
+      method = 'PUT';
+      }
+      else {
+    urlForFetch = '/api/processes'; 
+    method = 'POST';
+}
+
       if (processId) {
         document.getElementById('processId').value = processId;
-        const response = await fetch(`/api/processes/${processId}`);
+        const response = await fetch(urlForFetch);
         if (response.ok) {
           const process = await response.json();
           document.getElementById('name').value = process.name;
@@ -84,8 +102,10 @@
         users: document.getElementById('users').value.split(',').map(user => user.trim()),
         status: document.getElementById('status').value,
       };
-      const response = await fetch('/api/processes/${processId}', {
-        method: 'PUT',
+
+
+      const response = await fetch(urlForFetch, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -96,6 +116,21 @@
         window.location.href = 'index.html';
       } else {
         alert('Falha ao atualizar o processo');
+      }
+    });
+
+    document.getElementById('toggleButton').addEventListener('click', () => {
+      const menu = document.getElementById('menu');
+      const collapseIcon = document.getElementById('collapseIcon');
+      const expandIcon = document.getElementById('expandIcon');
+      if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        expandIcon.classList.add('hidden');
+        collapseIcon.classList.remove('hidden');
+      } else {
+        menu.classList.add('hidden');
+        collapseIcon.classList.add('hidden');
+        expandIcon.classList.remove('hidden');
       }
     });
   </script>
