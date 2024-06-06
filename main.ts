@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { handleProcessRequest } from "./processes.ts";
 import { handleRiskRequest } from "./risks.ts";
+import { serveDir } from "https://deno.land/std@0.224.0/http/file_server.ts";
 
 console.log("Servidor HTTP rodando. Acesse em: http://localhost:8080/");
 
@@ -18,8 +19,13 @@ serve(async (req) => {
     return await handleRiskRequest(req);
   }
 
-  return new Response("Rota não encontrada", {
-    status: 404,
-    headers: { "Content-Type": "text/plain" }
+
+  // Servindo arquivos estáticos
+  console.log("Servindo arquivos estáticos");
+  return serveDir(req, {
+    fsRoot: ".",
+    urlRoot: "",
+    showDirListing: true,
+    enableCors: true,
   });
 }, { port: 8080 });
