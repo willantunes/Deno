@@ -106,6 +106,70 @@
   <script src="https://unpkg.com/bpmn-js/dist/bpmn-modeler.development.js"></script>
   <script src="https://unpkg.com/jquery/dist/jquery.js"></script>
   <script>
+
+var urlForFetch = '';
+      var method = '';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const processId = urlParams.get('id');
+
+
+      if(urlParams.get('id') !== '' && urlParams.get('id') !== undefined && urlParams.get('id') !== null) {
+      urlForFetch = '/api/processes/' + urlParams.get('id');
+      method = 'PUT';
+      }
+      else {
+    urlForFetch = '/api/processes'; 
+    method = 'POST';
+}
+
+      if (processId) {
+        document.getElementById('processId').value = processId;
+        const response = await fetch(urlForFetch);
+        if (response.ok) {
+          const process = await response.json();
+          document.getElementById('name').value = process.name;
+          document.getElementById('version').value = process.version;
+          document.getElementById('objective').value = process.objective;
+          document.getElementById('owner').value = process.owner;
+          document.getElementById('users').value = process.users.join(', ');
+          document.getElementById('status').value = process.status;
+        } else {
+          alert('Processo não encontrado');
+        }
+      }
+    });
+
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const processId = document.getElementById('processId').value;
+      const data = {
+        name: document.getElementById('name').value,
+        version: document.getElementById('version').value,
+        objective: document.getElementById('objective').value,
+        owner: document.getElementById('owner').value,
+        users: document.getElementById('users').value.split(',').map(user => user.trim()),
+        status: document.getElementById('status').value,
+      };
+
+
+      const response = await fetch(urlForFetch, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (response.ok) {
+        alert('Processo atualizado com sucesso');
+        window.location.href = 'index.html';
+      } else {
+        alert('Falha ao atualizar o processo');
+      }
+    });
+
+
     var modeler = new BpmnJS({
       container: '#diagram',
       keyboard: {
