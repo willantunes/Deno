@@ -1,5 +1,6 @@
 import { serveDir } from "https://deno.land/std@0.224.0/http/file_server.ts";
 
+
 interface Process {
   id: number;
   name: string;
@@ -31,6 +32,7 @@ export async function handleProcessRequest(req: Request): Promise<Response> {
 
   if (pathname === "/api/processes" && req.method === "POST") {
     const body = await req.json();
+    
     const { name, version, objective, owner, users, status, diagramXML } = body;
     const newProcess = {
       id: currentProcessId++,
