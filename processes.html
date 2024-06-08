@@ -21,13 +21,13 @@
       </button>
     </div>
     <nav :class="{'hidden': !open, 'block': open}" class="flex-1 px-4 py-2 space-y-2">
-      <a href="index.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+      <a href="processes.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
         <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18m-9 5h9"></path>
         </svg>
         <span x-show="open">Processos</span>
       </a>
-      <a href="edit.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+      <a href="editProcess.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
         <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
@@ -45,12 +45,12 @@
     <h1 class="text-2xl font-bold mb-4">Lista de Processos</h1>
     <table class="min-w-full bg-white">
       <thead>
-        <tr>
-          <th class="py-2 px-4 border-b">ID</th>
-          <th class="py-2 px-4 border-b">Nome</th>
-          <th class="py-2 px-4 border-b">Versão</th>
-          <th class="py-2 px-4 border-b">Objetivo</th>
-          <th class="py-2 px-4 border-b">Ações</th>
+        <tr class="text-left">
+          <th class="py-2 px-4 border-b-2">ID</th>
+          <th class="py-2 px-4 border-b-2">Nome</th>
+          <th class="py-2 px-4 border-b-2">Versão</th>
+          <th class="py-2 px-4 border-b-2">Objetivo</th>
+          <th class="py-2 px-4 border-b-2">Ações</th>
         </tr>
       </thead>
       <tbody id="processTable">
@@ -72,7 +72,7 @@
               <td class="py-2 px-4 border-b">${process.version}</td>
               <td class="py-2 px-4 border-b">${process.objective}</td>
               <td class="py-2 px-4 border-b">
-                <a href="edit.html?id=${process.id}" class="text-blue-600 hover:underline">Editar</a>
+                <a href="editProcess.html?id=${process.id}" class="text-blue-600 hover:underline">Editar</a>
               </td>
             </tr>
           `).join('');

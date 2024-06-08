@@ -70,7 +70,7 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
 
   if (response.ok) {
     alert('Processo atualizado com sucesso');
-    window.location.href = 'index.html';
+    window.location.href = 'processes.html';
   } else {
     alert('Falha ao atualizar o processo');
   }

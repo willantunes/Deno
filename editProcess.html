@@ -50,12 +50,29 @@
           </svg>
         </button>
       </div>
-      <nav id="menu" class="flex-1 px-4 py-2 space-y-2">
-        <a href="index.html" class="block px-4 py-2 rounded hover:bg-gray-700">Processos</a>
-        <a href="edit.html" class="block px-4 py-2 rounded hover:bg-gray-700">Novo Processo</a>
+      <nav :class="{'hidden': !open, 'block': open}" class="flex-1 px-4 py-2 space-y-2">
+        
+        <!--<a href="edit.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+          <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span x-show="open">Novo Risco</span>
+        </a>-->
+        <a href="processes.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+          <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18m-9 5h9"></path>
+          </svg>
+          <span x-show="open">Processos</span>
+        </a>
+        <a href="risks.html" class="flex items-center px-4 py-2 rounded hover:bg-gray-700">
+          <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18m-9 5h9"></path>
+          </svg>
+          <span x-show="open">Riscos</span>
+        </a>
       </nav>
     </div>
-    <div class="flex-1 flex flex-col" style="margin-left: 256px;">
+    <div class="flex-1 flex flex-col" style="height: 650px;">
       <div class="p-6">
         <h1 class="text-2xl font-bold mb-4">Editar Processo</h1>
         <form id="editForm" class="space-y-4">
